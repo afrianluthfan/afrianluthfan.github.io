@@ -1,0 +1,161 @@
+cv:
+  name: Afrian Luthfan, S.Si. Kom.
+  location: Bogor, Indonesia
+  email: afrian.luthfan@gmail.com
+  phone: "+6287873039652"
+  website: https://riann.is-a.dev
+  social_networks:
+    - network: LinkedIn
+      username: afrian-luthfan
+  sections:
+    Summary:
+      - I have a bachelor's degree in software engineering.  Seeking to use my JavaScript, TypeScript, and Python skills alongside my commitment to teamwork and experiences to serve your company.
+
+    experience:
+      - company: PT Bank Raya Indonesia Tbk.
+        position: Management Trainee - Junior Analyst
+        start_date: 2024-04
+        end_date: present
+        highlights:
+          - Learned about leadership skills and created backend endpoints
+          - Created a machine learning model to distinguish AI-generated faces from real ones
+          - Joined the 'Culture Ranger' as a member and some committees, impacting ~300 employees
+          - Helped in creating a Retrieval Augmented Generation chatbot using Google's Gemini LLM and Google Vertex, impacting >1000 employees (everyone in the company)
+          - Created internal APIs to help the company in their daily operations, impacting ~100 employees
+
+      - company: Badan Amil Zakat Nasional
+        position: Database Intern
+        start_date: 2022-06
+        end_date: 2022-08
+        highlights:
+          - Created a data lake system for Badan Amil Zakat Nasional's application called SIMBA
+
+      - company: Slide Factory
+        position: Virtual Assistant
+        start_date: 2022-01
+        end_date: 2022-06
+        highlights:
+          - Became a core member in 17 distinct international communities with sizes ranging from 1,000 members up to 100,000 members
+          - Maintained communications and gained whitelist access
+
+      - company: Indosat Ooredoo
+        position: Executive Vice Chairman of E-Wallet User Research Challenge Event Organizer
+        start_date: 2021-06
+        end_date: 2021-11
+        highlights:
+          - Organized a national scale competition comprising three divisions in the committee
+          - Led 14 active staff members in total, impacting over 1000 individuals
+
+    education:
+      - institution: Telkom University
+        area: Software Engineering
+        degree: Bachelor's degree
+        start_date: 2019-08
+        end_date: 2023-11
+        highlights:
+          - "GPA: 3.31/4.00"
+          - "Supporting document: https://bit.ly/afrian-diploma"
+
+    certifications:
+      - name: Learn to Create Web Applications with React
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Learn to Create Front-End Web for Beginners
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Learn Basic JavaScript Programming
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Learn Basic Web Programming
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Learn Basic Structured Query Language (SQL)
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Learn DevOps Basics
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Learn Basic Project Management
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: Start Basic Programming to Become a Software Developer
+        date: 2023 - 2026
+        location: Dicoding Indonesia
+
+      - name: EF SET English Certificate 79/100 (C2 Proficient)
+        date: Lifetime from 2023
+        location: English First
+
+    portfolio:
+      - name: Personal Portfolio Website
+        url: https://riann.is-a.dev/
+        highlights:
+          - My own personal Portfolio website containing my projects and resume
+        status: Finished, needs update on the data per January 2026
+
+      - name: Identi-fy
+        url: https://identi-fy.live
+        highlights:
+          - A web app that summarizes a Spotify user's profile based on their top artists and tracks using Spotify API
+        status: Waiting for third party approval
+
+      - name: RAVA (AI based Chatbot for PT Bank Raya Indonesia Tbk.)
+        url: Internal Use Only
+        highlights:
+          - Retrieval Augmented Generation Chatbot using Google's Gemini LLM running on Google Vertex
+          - Used by >1000 employees in the company
+
+      - name: AI-Assisted SnippingTool OCR Text Summarizer
+        url: https://github.com/afrianluthfan/ai-assisted-snippingtool-ocr-text-summarizer
+        highlights:
+          - A tool that can summarize text from images using Tesseract OCR and Google's Gemini LLM API
+
+      - name: Uniform PDF Page Size Transformer
+        url: https://github.com/afrianluthfan/uniform-pdf-page-size-transformer
+        highlights:
+          - A tool that can transform all pages in a PDF file to have the same size using PyMuPDF
+
+      - name: Uker Mapping Service
+        url: Internal Use Only
+        highlights:
+          - An internal API service that maps the company's CIF acquisition to the respective branch office
+          - Used by ~100 employees in the company
+
+    Organizational Experience:
+      - company: Himpunan Mahasiswa S1 Rekayasa Perangkat Lunak Telkom University
+        position: Vice President
+        start_date: 2022-01
+        end_date: 2023-01
+        highlights:
+          - Pioneered the organization by being the first generation of leaders in the organization
+          - Led and responsible for nine divisions in the organizational body, comprising 47 active staff members in total
+          - Impacted over 300 individuals
+          - Developed and implemented 38 different projects
+      - company: PT Bank Raya Indonesia Tbk.
+        position: Culture Ranger Member
+        start_date: 2025-01
+        end_date: 2026-01
+        highlights:
+          - Joined the 'Culture Ranger' as a member to help improve company culture and fulfill KPIs
+          - Impacted ~300 employees
+      - company: PT Bank Raya Indonesia Tbk.
+        position: RIF Committee, Head of Permit and Supplies division
+        start_date: 2025-01
+        end_date: 2025-03
+        highlights:
+          - Managed and led the permit and supplies division in organizing the permits and supplies needed for the RIF event
+          - Impacted ~300 employees
+      - company: PT Bank Raya Indonesia Tbk.
+        position: DDO Super League Committee, Staff of Event Division
+        start_date: 2025-08
+        end_date: 2025-12
+        highlights:
+          - Managed and organized the events in the DDO Super League event
+          - Impacted ~300 employees
