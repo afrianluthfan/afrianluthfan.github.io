@@ -72,10 +72,10 @@ export default function ExperienceSection({
                 <button
                   key={i}
                   onClick={() => setActiveIdx(i)}
-                  className={`w-full text-left px-4 py-4 transition-all duration-200 border-3 font-bold rounded-xl ${
+                  className={`cursor-pointer w-full text-left px-4 py-4 transition-all duration-200 font-bold rounded-xl ${
                     activeIdx === i
-                      ? "border-(--color-brutal-black) brutal-shadow translate-x-0"
-                      : "hover:border-(--color-brutal-black) border-gray-400 border-[1.5px] hover:border-2"
+                      ? "border-3 border-(--color-brutal-black) brutal-shadow translate-x-0"
+                      : "border-2 border-gray-300 hover:border-(--color-brutal-black)"
                   }`}
                   style={{
                     backgroundColor: activeIdx === i ? color : "transparent",
