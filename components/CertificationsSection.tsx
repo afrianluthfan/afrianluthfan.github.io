@@ -51,7 +51,7 @@ export default function CertificationsSection({
           }}
         >
           <div className="flex flex-wrap flex-col items-start gap-4 mb-12">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-(--color-brutal-black) tracking-tight uppercase">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-(--color-brutal-black) tracking-tight uppercase break-words">
               Certifications
               <span className="inline-block w-4 h-4 bg-(--color-brutal-red) border-2 border-(--color-brutal-black) ml-2 align-middle rounded-full" />
             </h2>

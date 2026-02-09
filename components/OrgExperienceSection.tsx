@@ -66,7 +66,7 @@ export default function OrgExperienceSection({
             transition: "all 0.6s ease",
           }}
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-(--color-brutal-black) tracking-tight uppercase mb-12">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-(--color-brutal-black) tracking-tight uppercase mb-12 break-words">
             Organizational
             <br />
             Experience
