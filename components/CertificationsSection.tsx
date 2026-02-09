@@ -6,6 +6,7 @@ import type { Certification } from "@/lib/cv";
 
 interface CertificationsSectionProps {
   certifications: Certification[];
+  certificationsUrl?: string;
 }
 
 const cardColors = [
@@ -19,6 +20,7 @@ const cardColors = [
 
 export default function CertificationsSection({
   certifications,
+  certificationsUrl,
 }: CertificationsSectionProps) {
   const ref = useRef<HTMLElement>(null);
   const isVisible = useInView(ref, 0.1);
@@ -48,10 +50,37 @@ export default function CertificationsSection({
             transition: "all 0.6s ease",
           }}
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-(--color-brutal-black) tracking-tight uppercase mb-12">
-            Certifications
-            <span className="inline-block w-4 h-4 bg-(--color-brutal-red) border-2 border-(--color-brutal-black) ml-2 align-middle rounded-full" />
-          </h2>
+          <div className="flex flex-wrap flex-col items-start gap-4 mb-12">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-(--color-brutal-black) tracking-tight uppercase">
+              Certifications
+              <span className="inline-block w-4 h-4 bg-(--color-brutal-red) border-2 border-(--color-brutal-black) ml-2 align-middle rounded-full" />
+            </h2>
+            {certificationsUrl && (
+              <a
+                href={certificationsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 font-mono text-xs font-bold px-4 py-2 bg-(--color-brutal-black) text-white border-2 border-(--color-brutal-black) rounded-lg brutal-shadow-interactive"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                View All Certificates
+              </a>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

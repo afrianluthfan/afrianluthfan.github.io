@@ -75,7 +75,7 @@ export default function ExperienceSection({
                   className={`w-full text-left px-4 py-4 transition-all duration-200 border-3 font-bold rounded-xl ${
                     activeIdx === i
                       ? "border-(--color-brutal-black) brutal-shadow translate-x-0"
-                      : "border-transparent hover:border-(--color-brutal-black)"
+                      : "hover:border-(--color-brutal-black) border-gray-400 border-[1.5px] hover:border-2"
                   }`}
                   style={{
                     backgroundColor: activeIdx === i ? color : "transparent",

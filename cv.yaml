@@ -4,6 +4,7 @@ cv:
   email: afrian.luthfan@gmail.com
   phone: "+6287873039652"
   website: https://riann.is-a.dev
+  github: https://github.com/afrianluthfan
   social_networks:
     - network: LinkedIn
       username: afrian-luthfan
@@ -56,6 +57,7 @@ cv:
           - "GPA: 3.31/4.00"
           - "Supporting document: https://bit.ly/afrian-diploma"
 
+    certifications_url: https://drive.google.com/drive/folders/169VNm52cDgVITDjCsJ7qCEL6z9UBe5H1?usp=sharing
     certifications:
       - name: Learn to Create Web Applications with React
         date: 2023 - 2026

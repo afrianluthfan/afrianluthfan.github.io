@@ -23,6 +23,7 @@ export interface Certification {
   name: string;
   date: string;
   location: string;
+  url?: string;
 }
 
 export interface PortfolioItem {
@@ -43,11 +44,13 @@ export interface CVData {
   email: string;
   phone: string;
   website: string;
+  github?: string;
   social_networks: SocialNetwork[];
   sections: {
     Summary: string[];
     experience: Experience[];
     education: Education[];
+    certifications_url?: string;
     certifications: Certification[];
     portfolio: PortfolioItem[];
     "Organizational Experience": Experience[];

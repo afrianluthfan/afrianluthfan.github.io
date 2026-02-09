@@ -9,6 +9,7 @@ interface HeroSectionProps {
   website: string;
   phone: string;
   linkedinUsername: string;
+  githubUrl?: string;
 }
 
 export default function HeroSection({
@@ -17,6 +18,7 @@ export default function HeroSection({
   email,
   website,
   linkedinUsername,
+  githubUrl,
 }: HeroSectionProps) {
   const [time, setTime] = useState("");
   const sectionRef = useRef<HTMLElement>(null);
@@ -30,7 +32,7 @@ export default function HeroSection({
         new Date().toLocaleTimeString("en-US", {
           hour12: false,
           timeZone: "Asia/Jakarta",
-        }),
+        })
       );
     }, 1000);
 
@@ -130,14 +132,14 @@ export default function HeroSection({
               <span className="w-3 h-3 bg-(--color-brutal-red) border border-(--color-brutal-black) rounded-full" />
               {email}
             </a>
-            <a
+            {/* <a
               href={website}
               target="_blank"
               className="bg-white border-2 border-(--color-brutal-black) px-4 py-2.5 brutal-shadow-interactive font-bold flex items-center gap-2 rounded-xl"
             >
               <span className="w-3 h-3 bg-(--color-brutal-blue) border border-(--color-brutal-black) rounded-full" />
               {website.replace("https://", "")}
-            </a>
+            </a> */}
             <a
               href={`https://linkedin.com/in/${linkedinUsername}`}
               target="_blank"
@@ -146,6 +148,17 @@ export default function HeroSection({
               <span className="w-3 h-3 bg-(--color-brutal-green) border border-(--color-brutal-black) rounded-full" />
               LinkedIn
             </a>
+            {githubUrl && (
+              <a
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white border-2 border-(--color-brutal-black) px-4 py-2.5 brutal-shadow-interactive font-bold flex items-center gap-2 rounded-xl"
+              >
+                <span className="w-3 h-3 bg-(--color-brutal-yellow) border border-(--color-brutal-black) rounded-full" />
+                GitHub
+              </a>
+            )}
           </div>
         </div>
       </div>

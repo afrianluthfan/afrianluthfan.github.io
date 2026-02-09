@@ -8,6 +8,7 @@ interface FooterSectionProps {
   email: string;
   website: string;
   linkedinUsername: string;
+  githubUrl?: string;
 }
 
 export default function FooterSection({
@@ -15,6 +16,7 @@ export default function FooterSection({
   email,
   website,
   linkedinUsername,
+  githubUrl,
 }: FooterSectionProps) {
   const ref = useRef<HTMLElement>(null);
   const isVisible = useInView(ref, 0.2);
@@ -58,14 +60,14 @@ export default function FooterSection({
             <span className="w-4 h-4 bg-(--color-brutal-red) border-2 border-(--color-brutal-black) rounded-full" />
             {email}
           </a>
-          <a
+          {/* <a
             href={website}
             target="_blank"
             className="bg-(--color-brutal-yellow) border-3 border-(--color-brutal-black) px-6 py-3 brutal-shadow-lg-interactive font-mono text-sm font-bold flex items-center gap-3 rounded-xl"
           >
             <span className="w-4 h-4 bg-(--color-brutal-green) border-2 border-(--color-brutal-black) rounded-full" />
             {website.replace("https://", "")}
-          </a>
+          </a> */}
           <a
             href={`https://linkedin.com/in/${linkedinUsername}`}
             target="_blank"
@@ -74,6 +76,17 @@ export default function FooterSection({
             <span className="w-4 h-4 bg-(--color-brutal-blue) border-2 border-(--color-brutal-black) rounded-full" />
             LinkedIn
           </a>
+          {githubUrl && (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-(--color-brutal-pink) border-3 border-(--color-brutal-black) px-6 py-3 brutal-shadow-lg-interactive font-mono text-sm font-bold flex items-center gap-3 rounded-xl"
+            >
+              <span className="w-4 h-4 bg-(--color-brutal-yellow) border-2 border-(--color-brutal-black) rounded-full" />
+              GitHub
+            </a>
+          )}
         </div>
 
         <div className="mt-12 sm:mt-20">

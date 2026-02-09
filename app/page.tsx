@@ -20,11 +20,15 @@ export default function Home() {
         phone={cv.phone}
         website={cv.website}
         linkedinUsername={cv.social_networks[0].username}
+        githubUrl={cv.github}
       />
       <SummarySection summary={cv.sections.Summary} />
       <ExperienceSection experiences={cv.sections.experience} />
       <EducationSection education={cv.sections.education} />
-      <CertificationsSection certifications={cv.sections.certifications} />
+      <CertificationsSection
+        certifications={cv.sections.certifications}
+        certificationsUrl={cv.sections.certifications_url}
+      />
       <PortfolioSection projects={cv.sections.portfolio} />
       <OrgExperienceSection
         experiences={cv.sections["Organizational Experience"]}
@@ -34,6 +38,7 @@ export default function Home() {
         email={cv.email}
         website={cv.website}
         linkedinUsername={cv.social_networks[0].username}
+        githubUrl={cv.github}
       />
     </main>
   );
