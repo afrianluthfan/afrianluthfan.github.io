@@ -122,11 +122,11 @@ cv:
         location: Anthropic
 
     portfolio:
-      - name: Personal Portfolio Website
-        highlights:
-          - My own personal Portfolio website containing my projects and resume
-          - https://riann.is-a.dev/
-        status: Finished, needs update on the data per January 2026
+      # - name: Personal Portfolio Website
+      #   highlights:
+      #     - My own personal Portfolio website containing my projects and resume
+      #     - https://riann.is-a.dev/
+      #   status: Finished, needs update on the data per January 2026
 
       # - name: Identi-fy
       #   url: https://identi-fy.live

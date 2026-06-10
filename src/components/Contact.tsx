@@ -1,9 +1,4 @@
-import {
-  ArrowUpRight,
-  GithubLogo,
-  LinkedinLogo,
-  Phone,
-} from "@phosphor-icons/react/dist/ssr";
+import * as ssr from "@phosphor-icons/react/dist/ssr";
 import type { Cv } from "@/lib/cv";
 import Reveal from "./Reveal";
 import { BrutalLink } from "./ui";
@@ -13,20 +8,19 @@ export default function Contact({ cv }: { cv: Cv }) {
   const year = new Date().getFullYear();
 
   return (
-    <section id="contact" className="flex min-h-[100dvh] flex-col bg-accent">
-      <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-5 py-32 md:px-10">
+    <section id="contact" className="flex min-h-dvh flex-col bg-accent">
+      <div className="mx-auto flex w-full max-w-350 flex-1 flex-col justify-center px-5 py-32 md:px-10">
         <Reveal>
           <h2 className="max-w-6xl font-display text-[clamp(2.8rem,8.5vw,7.5rem)] uppercase leading-[0.9] tracking-tight">
             Got a role or a project in mind?
           </h2>
           <p className="mt-9 max-w-xl text-lg font-medium leading-relaxed md:text-xl">
-            Junior analyst at Bank Raya Indonesia, building things with
-            TypeScript and Python. Always open to interesting problems.
+            Hit me up through these means and let's work together!
           </p>
           <div className="mt-14">
             <BrutalLink href={`mailto:${cv.email}`} size="lg">
               Email me
-              <ArrowUpRight
+              <ssr.ArrowUpRight
                 weight="bold"
                 className="size-5 transition-transform duration-300 ease-snap group-hover:translate-x-1 group-hover:-translate-y-1 md:size-7"
               />
@@ -41,7 +35,7 @@ export default function Contact({ cv }: { cv: Cv }) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 border-[3px] border-ink px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-200 hover:bg-ink hover:text-paper"
                 >
-                  <LinkedinLogo weight="bold" className="size-4" />
+                  <ssr.LinkedinLogo weight="bold" className="size-4" />
                   LinkedIn
                 </a>
               </li>
@@ -53,11 +47,11 @@ export default function Contact({ cv }: { cv: Cv }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 border-[3px] border-ink px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-200 hover:bg-ink hover:text-paper"
               >
-                <GithubLogo weight="bold" className="size-4" />
+                <ssr.GithubLogo weight="bold" className="size-4" />
                 GitHub
               </a>
             </li>
-            <li>
+            {/* <li>
               <a
                 href={`tel:${cv.phone}`}
                 className="inline-flex items-center gap-2 border-[3px] border-ink px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-200 hover:bg-ink hover:text-paper"
@@ -65,12 +59,12 @@ export default function Contact({ cv }: { cv: Cv }) {
                 <Phone weight="bold" className="size-4" />
                 {cv.phone}
               </a>
-            </li>
+            </li> */}
           </ul>
         </Reveal>
       </div>
       <footer className="border-t-[3px] border-ink">
-        <div className="mx-auto flex w-full max-w-[1400px] flex-wrap items-center justify-between gap-3 px-5 py-5 font-mono text-xs font-bold uppercase tracking-wider md:px-10">
+        <div className="mx-auto flex w-full max-w-350 flex-wrap items-center justify-between gap-3 px-5 py-5 font-mono text-xs font-bold uppercase tracking-wider md:px-10">
           <span>{cv.name}</span>
           <span>{cv.location}</span>
           <span>(c) {year}</span>

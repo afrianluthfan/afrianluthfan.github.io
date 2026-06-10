@@ -17,6 +17,7 @@ export default function Hero({ cv }: { cv: Cv }) {
               {cv.location}
             </Chip>
             <Chip variant="accent">Software Engineer</Chip>
+            <Chip variant="accent">AI Engineer</Chip>
           </div>
           <h1
             className="anim-rise font-display text-[clamp(3.6rem,11.5vw,10rem)] uppercase leading-[0.88] tracking-tight"
@@ -30,7 +31,7 @@ export default function Hero({ cv }: { cv: Cv }) {
             className="anim-rise mt-8 max-w-xl text-lg font-medium leading-relaxed md:text-xl"
             style={{ "--rise-delay": "220ms" } as React.CSSProperties}
           >
-            Software engineer at Bank Raya Indonesia building backend services,
+            Junior Analyst at Bank Raya Indonesia building backend services,
             internal APIs, and AI tools used by 1,000+ employees.
           </p>
           <div
