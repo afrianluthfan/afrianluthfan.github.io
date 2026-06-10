@@ -1,30 +1,35 @@
-import React from 'react';
-import ProfileSection from '@/components/sections/ProfileSection';
-import IntroSection from '@/components/sections/IntroSection';
-import IntroSection2 from '@/components/sections/IntroSection2';
-import StacksSection from '@/components/sections/StacksSection';
-import StacksSection2 from '@/components/sections/ToolsSection';
-import Separator from '@/components/Separator';
-import ExperiencesSection from '@/components/sections/ExperiencesSection';
-import CertificationsSection from '@/components/sections/CertificationsSection';
-import OtherProjectSection from '@/components/sections/OtherProjectSection';
-import CVSection from '@/components/sections/CVSection';
-import FooterSection from '@/components/sections/FooterSection';
+import { loadCv } from "@/lib/cv";
+import Nav from "@/components/Nav";
+import Hero from "@/components/Hero";
+import Marquee from "@/components/Marquee";
+import Summary from "@/components/Summary";
+import Experience from "@/components/Experience";
+import Education from "@/components/Education";
+import Certifications from "@/components/Certifications";
+import Projects from "@/components/Projects";
+import Leadership from "@/components/Leadership";
+import Contact from "@/components/Contact";
 
-const Home = () => (
-  <main className='overflow-hidden'>
-    <ProfileSection />
-    <IntroSection />
-    <StacksSection />
-    <Separator />
-    <StacksSection2 />
-    <IntroSection2 />
-    <ExperiencesSection />
-    <CertificationsSection />
-    <Separator />
-    <OtherProjectSection />
-    <CVSection />
-    <FooterSection />
-  </main>
-);
-export default Home;
+export default function Home() {
+  const cv = loadCv();
+
+  return (
+    <>
+      <Nav email={cv.email} />
+      <main id="main" className="w-full max-w-full overflow-x-hidden">
+        <Hero cv={cv} />
+        <Marquee />
+        <Summary
+          summary={cv.sections.Summary[0]}
+          certCount={cv.sections.certifications.length}
+        />
+        <Experience roles={cv.sections.experience} />
+        <Education entry={cv.sections.education[0]} />
+        <Certifications certs={cv.sections.certifications} />
+        <Projects projects={cv.sections.portfolio} />
+        <Leadership roles={cv.sections["Organizational Experience"]} />
+        <Contact cv={cv} />
+      </main>
+    </>
+  );
+}
