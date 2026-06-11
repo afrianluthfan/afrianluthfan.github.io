@@ -2,27 +2,27 @@ import type { CertificationEntry } from "@/lib/cv";
 import Reveal from "./Reveal";
 
 /*
- * Span map interlocks an 11-ticket grid on 6 columns with zero voids:
+ * Ticket map interlocks an 11-ticket grid on 6 columns with zero voids:
  * row 1: 2+2+2 | row 2: 3+3 | row 3: 2+2+2 | row 4: 4+2 | row 5: 6
+ * Colors follow the Projects cycle (paper/ink/paper/accent/paper) so the
+ * rhythm repeats every row pair, with the full-width closer in ink:
+ * row 1: ·■· | row 2: ▲· | row 3: ·■· | row 4: ▲· | row 5: ■
  */
-const SPANS = [
-  "md:col-span-2",
-  "md:col-span-2",
-  "md:col-span-2",
-  "md:col-span-3",
-  "md:col-span-3",
-  "md:col-span-2",
-  "md:col-span-2",
-  "md:col-span-2",
-  "col-span-2 md:col-span-4",
-  "md:col-span-2",
-  "col-span-2 md:col-span-6",
+const TICKETS = [
+  { span: "md:col-span-2", theme: "bg-paper" },
+  { span: "md:col-span-2", theme: "bg-ink text-paper" },
+  { span: "md:col-span-2", theme: "bg-paper" },
+  { span: "md:col-span-3", theme: "bg-accent" },
+  { span: "md:col-span-3", theme: "bg-paper" },
+  { span: "md:col-span-2", theme: "bg-paper" },
+  { span: "md:col-span-2", theme: "bg-ink text-paper" },
+  { span: "md:col-span-2", theme: "bg-paper" },
+  { span: "md:col-span-4", theme: "bg-accent" },
+  { span: "md:col-span-2", theme: "bg-paper" },
+  { span: "col-span-2 md:col-span-6", theme: "bg-ink text-paper" },
 ];
 
-const VARIANTS: Record<number, string> = {
-  3: "bg-accent",
-  10: "bg-ink text-paper",
-};
+const FALLBACK_TICKET = { span: "md:col-span-2", theme: "bg-paper" };
 
 export default function Certifications({
   certs,
@@ -49,12 +49,12 @@ export default function Certifications({
           stagger
           className="mt-14 grid grid-flow-dense grid-cols-2 gap-4 md:grid-cols-6 md:gap-5"
         >
-          {certs.map((cert, i) => (
+          {certs.map((cert, i) => {
+            const ticket = TICKETS[i] ?? FALLBACK_TICKET;
+            return (
             <article
               key={cert.name}
-              className={`flex min-h-[150px] flex-col justify-between gap-5 border-[3px] border-ink p-5 shadow-hard-sm transition-transform duration-300 ease-snap hover:-translate-y-1 md:p-6 ${
-                VARIANTS[i] ?? "bg-paper"
-              } ${SPANS[i] ?? "md:col-span-2"}`}
+              className={`flex min-h-[150px] flex-col justify-between gap-5 border-[3px] border-ink p-5 shadow-hard-sm transition-transform duration-300 ease-snap hover:-translate-y-1 md:p-6 ${ticket.theme} ${ticket.span}`}
             >
               <div className="flex items-start justify-between gap-3 font-mono text-[11px] font-bold uppercase tracking-wider">
                 <span>{cert.location}</span>
@@ -64,7 +64,8 @@ export default function Certifications({
                 {cert.name}
               </h3>
             </article>
-          ))}
+            );
+          })}
         </Reveal>
       </div>
     </section>

@@ -2,14 +2,16 @@ import * as ssr from "@phosphor-icons/react/dist/ssr";
 import type { Cv } from "@/lib/cv";
 import Reveal from "./Reveal";
 import { BrutalLink } from "./ui";
+import InkField from "./InkField";
 
 export default function Contact({ cv }: { cv: Cv }) {
   const linkedin = cv.social_networks.find((s) => s.network === "LinkedIn");
   const year = new Date().getFullYear();
 
   return (
-    <section id="contact" className="flex min-h-dvh flex-col bg-accent">
-      <div className="mx-auto flex w-full max-w-350 flex-1 flex-col justify-center px-5 py-32 md:px-10">
+    <section id="contact" className="relative flex min-h-dvh flex-col bg-accent">
+      <InkField variant="accent" />
+      <div className="relative mx-auto flex w-full max-w-350 flex-1 flex-col justify-center px-5 py-32 md:px-10">
         <Reveal>
           <h2 className="max-w-6xl font-display text-[clamp(2.8rem,8.5vw,7.5rem)] uppercase leading-[0.9] tracking-tight">
             Got a role or a project in mind?
@@ -63,7 +65,7 @@ export default function Contact({ cv }: { cv: Cv }) {
           </ul>
         </Reveal>
       </div>
-      <footer className="border-t-[3px] border-ink">
+      <footer className="relative border-t-[3px] border-ink">
         <div className="mx-auto flex w-full max-w-350 flex-wrap items-center justify-between gap-3 px-5 py-5 font-mono text-xs font-bold uppercase tracking-wider md:px-10">
           <span>{cv.name}</span>
           <span>{cv.location}</span>
