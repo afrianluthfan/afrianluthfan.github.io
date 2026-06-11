@@ -2,11 +2,13 @@ import Image from "next/image";
 import { ArrowUpRight, MapPin } from "@phosphor-icons/react/dist/ssr";
 import type { Cv } from "@/lib/cv";
 import { BrutalLink, Chip } from "./ui";
+import InkField from "./InkField";
 
 export default function Hero({ cv }: { cv: Cv }) {
   return (
     <section className="relative flex min-h-[100dvh] items-center pb-20 pt-28 md:pt-24">
-      <div className="mx-auto grid w-full max-w-[1400px] items-center gap-14 px-5 md:px-10 lg:grid-cols-12">
+      <InkField variant="paper" />
+      <div className="relative mx-auto grid w-full max-w-[1400px] items-center gap-14 px-5 md:px-10 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <div
             className="anim-rise mb-7 flex flex-wrap gap-3"
