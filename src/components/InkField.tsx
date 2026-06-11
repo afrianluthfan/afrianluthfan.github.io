@@ -20,6 +20,7 @@ uniform vec3 u_ink;
 uniform vec3 u_pop;
 uniform vec2 u_clear;
 uniform vec2 u_calm;
+uniform float u_idle;
 
 float hash(vec2 p) {
   p = fract(p * vec2(234.34, 435.345));
@@ -52,16 +53,20 @@ float fbm(vec2 p) {
 void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
   vec2 p = gl_FragCoord.xy / u_res.y;
-  float t = u_time * 0.055;
+  float t = u_time * 0.09;
 
-  // slowly drifting, self-warping ink field
+  // drifting, self-warping ink field
   vec2 warp = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 - t + 5.2));
   float field = fbm(p * 2.3 + warp * 1.15 + vec2(t * 0.5, -t * 0.35));
 
-  // cursor: local swell plus a faint radiating press ripple
+  // rolling density waves keep the plate alive with no input
+  field += sin(p.x * 1.8 + p.y * 1.3 - u_time * 0.55) * 0.06;
+
+  // focal point: the cursor, or the roaming press head when idle
+  // (the idle swell is broader and softer than the cursor's)
   vec2 m = u_mouse / u_res.y;
   float md = length(p - m);
-  field += exp(-md * 4.0) * 0.5;
+  field += exp(-md * mix(4.0, 2.7, u_idle)) * 0.5;
   field += sin(md * 36.0 - u_time * 2.2) * 0.07 * exp(-md * 4.5);
 
   // keep the typography zone calm
@@ -168,23 +173,40 @@ export default function InkField({
     const uRes = u("u_res");
     const uTime = u("u_time");
     const uMouse = u("u_mouse");
+    const uIdle = u("u_idle");
     gl.uniform3fv(u("u_bg"), palette.bg);
     gl.uniform3fv(u("u_ink"), palette.ink);
     gl.uniform3fv(u("u_pop"), palette.pop);
     gl.uniform2fv(u("u_clear"), palette.clear);
     gl.uniform2fv(u("u_calm"), palette.calm);
 
-    const mouse = { x: 0, y: 0, tx: 0, ty: 0, seeded: false };
+    const mouse = { x: 0, y: 0, px: 0, py: 0, seeded: false };
     const start = performance.now();
+    let vw = 1;
+    let vh = 1;
+    let lastMove = -1e9; // fully idle on load, so the roam starts right away
+    let idleMix = 1;
     let raf = 0;
     let running = false;
     let inView = true;
 
     const draw = (time: number) => {
-      mouse.x += (mouse.tx - mouse.x) * 0.07;
-      mouse.y += (mouse.ty - mouse.y) * 0.07;
+      const now = performance.now();
+      // crossfade between the cursor and the roaming idle path
+      idleMix += ((now - lastMove > 2500 ? 1 : 0) - idleMix) * 0.025;
+      // unwrapped clock for the roam so the shader-time wrap never jumps it
+      const rt = (now - start) / 1000;
+      const roamX =
+        vw * (0.5 + 0.34 * Math.sin(rt * 0.32) + 0.1 * Math.sin(rt * 0.85 + 1.7));
+      const roamY =
+        vh * (0.52 + 0.3 * Math.cos(rt * 0.24) + 0.12 * Math.sin(rt * 0.61));
+      const tx = mouse.px + (roamX - mouse.px) * idleMix;
+      const ty = mouse.py + (roamY - mouse.py) * idleMix;
+      mouse.x += (tx - mouse.x) * 0.07;
+      mouse.y += (ty - mouse.y) * 0.07;
       gl.uniform1f(uTime, time);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.uniform1f(uIdle, idleMix);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
@@ -203,17 +225,17 @@ export default function InkField({
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const w = Math.max(1, Math.round(rect.width * dpr));
-      const h = Math.max(1, Math.round(rect.height * dpr));
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-      gl.uniform2f(uRes, w, h);
+      vw = Math.max(1, Math.round(rect.width * dpr));
+      vh = Math.max(1, Math.round(rect.height * dpr));
+      canvas.width = vw;
+      canvas.height = vh;
+      gl.viewport(0, 0, vw, vh);
+      gl.uniform2f(uRes, vw, vh);
       if (!mouse.seeded) {
         // resting focal point before any pointer input (and on touch)
         mouse.seeded = true;
-        mouse.x = mouse.tx = w * 0.72;
-        mouse.y = mouse.ty = h * 0.6;
+        mouse.x = mouse.px = vw * 0.72;
+        mouse.y = mouse.py = vh * 0.6;
       }
       if (reduceMotion) draw(7.3);
     };
@@ -237,8 +259,9 @@ export default function InkField({
 
     const onPointer = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
-      mouse.tx = (e.clientX - rect.left) * dpr;
-      mouse.ty = (rect.height - (e.clientY - rect.top)) * dpr;
+      mouse.px = (e.clientX - rect.left) * dpr;
+      mouse.py = (rect.height - (e.clientY - rect.top)) * dpr;
+      lastMove = performance.now();
     };
     window.addEventListener("pointermove", onPointer, { passive: true });
 
