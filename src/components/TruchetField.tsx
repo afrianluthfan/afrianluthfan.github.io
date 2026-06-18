@@ -20,7 +20,9 @@ uniform vec3 u_ink;
 uniform vec3 u_pop;
 uniform vec2 u_clear;
 uniform vec2 u_calm;
-uniform float u_idle;
+uniform float u_active;
+
+const float GRID = 8.0; // maze cells across the viewport height
 
 float hash(vec2 p) {
   p = fract(p * vec2(234.34, 435.345));
@@ -50,51 +52,66 @@ float fbm(vec2 p) {
   return v;
 }
 
+// Distance to the two quarter-circle arcs of one Truchet tile. cuv is cell-local
+// in [0,1]; the arcs are centred on opposite corners so the tile connects
+// (left<->bottom) and (top<->right) at the edge midpoints. Mirroring cuv.x gives
+// the flipped tile, which connects the other way — the two states of the maze.
+float arcs(vec2 cuv) {
+  float d1 = abs(length(cuv) - 0.5);             // arc about corner (0,0)
+  float d2 = abs(length(cuv - vec2(1.0)) - 0.5); // arc about corner (1,1)
+  return min(d1, d2);
+}
+
 void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
-  vec2 p = gl_FragCoord.xy / u_res.y;
-  float t = u_time * 0.09;
+  vec2 p = gl_FragCoord.xy / u_res.y;  // aspect-correct, height-normalised
+  float t = u_time;
 
-  // drifting, self-warping ink field
-  vec2 warp = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 - t + 5.2));
-  float field = fbm(p * 2.3 + warp * 1.15 + vec2(t * 0.5, -t * 0.35));
-
-  // rolling density waves keep the plate alive with no input
-  field += sin(p.x * 1.8 + p.y * 1.3 - u_time * 0.55) * 0.06;
-
-  // focal point: the cursor, or the roaming press head when idle
-  // (the idle swell is broader and softer than the cursor's)
+  // cursor focal point — its influence (u_active) fades to zero when the pointer
+  // goes idle, so nothing below animates unless you're actively moving the mouse
   vec2 m = u_mouse / u_res.y;
   float md = length(p - m);
-  field += exp(-md * mix(4.0, 2.7, u_idle)) * 0.5;
-  field += sin(md * 36.0 - u_time * 2.2) * 0.07 * exp(-md * 4.5);
+  float focus = exp(-md * 5.2) * u_active;
 
-  // keep the typography zone calm
+  // keep the typography zone calm: thin lines, no accent, no churn
   vec2 cd = uv - u_clear;
   cd.x *= u_res.x / u_res.y;
   float calm = smoothstep(u_calm.x, u_calm.y, length(cd));
 
-  // only the peaks of the field reach the plate
-  float sig = smoothstep(0.52, 1.04, field) * calm;
+  // grid
+  vec2 q = p * GRID;
+  vec2 cell = floor(q);
+  vec2 cuv = fract(q);
+  float rnd = hash(cell);
 
-  // rotated screen-space halftone grid
-  float cs = max(u_res.y / 86.0, 9.0);
-  float ca = 0.46;
-  mat2 rot = mat2(cos(ca), -sin(ca), sin(ca), cos(ca));
-  vec2 g = rot * gl_FragCoord.xy;
-  vec2 cell = floor(g / cs);
-  vec2 cuv = fract(g / cs) - 0.5;
-  float jitter = hash(cell);
+  // Each tile rests in one of the two orientations, chosen by its hash. Moving
+  // the cursor over a tile dissolves it back and forth to the flipped state; the
+  // stir scales with focus, so it settles to a clean, still orientation the
+  // moment the pointer goes idle. mixAB blends the two tile states.
+  float ori = step(0.5, rnd);
+  float stir = focus * (0.5 + 0.5 * sin(t * 3.0 + rnd * 6.2832));
+  float mixAB = mix(ori, 1.0 - ori, stir);
 
-  float r = sig * (0.58 + jitter * 0.1);
-  float aa = 1.5 / cs;
-  float dotMask = smoothstep(r, r - aa, length(cuv));
+  float dA = arcs(cuv);
+  float dB = arcs(vec2(1.0 - cuv.x, cuv.y));
 
-  // sparse pops where a slower field crests
-  float pop = step(0.82, noise(cell * 0.37 + t * 1.4)) * step(0.34, sig);
-  vec3 dotCol = mix(u_ink, u_pop, pop);
+  // line weight: a static fbm varies the stroke across the plate; the cursor
+  // swells it bold; the calm zone thins it back under the text
+  float breathe = fbm(p * 1.1);
+  float w = (0.072 + breathe * 0.05 + focus * 0.07) * mix(0.4, 1.0, calm);
+  float aa = 1.5 * GRID / u_res.y;
+  float lineA = smoothstep(w + aa, w - aa, dA);
+  float lineB = smoothstep(w + aa, w - aa, dB);
+  float line = mix(lineA, lineB, mixAB);
 
-  vec3 col = mix(u_bg, dotCol, dotMask);
+  // accent: fixed energy patches tint some arcs orange (static — no drift); the
+  // cursor lights up its surroundings on top
+  float energy = fbm(p * 1.4);
+  float accent = smoothstep(0.58, 0.74, energy) * calm;
+  accent = clamp(accent + focus * 0.55 * calm, 0.0, 1.0);
+  vec3 lineCol = mix(u_ink, u_pop, accent);
+
+  vec3 col = mix(u_bg, lineCol, line);
   // faint static grain so the flats aren't dead
   col += (hash(gl_FragCoord.xy) - 0.5) * 0.04;
 
@@ -119,7 +136,7 @@ const PALETTES = {
   },
 } as const;
 
-export default function InkField({
+export default function TruchetField({
   variant = "paper",
   className = "",
 }: {
@@ -154,7 +171,7 @@ export default function InkField({
     let uRes: WebGLUniformLocation | null = null;
     let uTime: WebGLUniformLocation | null = null;
     let uMouse: WebGLUniformLocation | null = null;
-    let uIdle: WebGLUniformLocation | null = null;
+    let uActive: WebGLUniformLocation | null = null;
     let ready = false;
 
     const compile = (type: number, src: string) => {
@@ -195,7 +212,7 @@ export default function InkField({
       uRes = u("u_res");
       uTime = u("u_time");
       uMouse = u("u_mouse");
-      uIdle = u("u_idle");
+      uActive = u("u_active");
       gl.uniform3fv(u("u_bg"), palette.bg);
       gl.uniform3fv(u("u_ink"), palette.ink);
       gl.uniform3fv(u("u_pop"), palette.pop);
@@ -226,8 +243,8 @@ export default function InkField({
     const start = performance.now();
     let vw = 1;
     let vh = 1;
-    let lastMove = -1e9; // fully idle on load, so the roam starts right away
-    let idleMix = 1;
+    let lastMove = -1e9; // no pointer input yet -> starts fully idle (static)
+    let active = 0;
     let raf = 0;
     let running = false;
     let inView = true;
@@ -235,21 +252,15 @@ export default function InkField({
     const draw = (time: number) => {
       if (!ready) return;
       const now = performance.now();
-      // crossfade between the cursor and the roaming idle path
-      idleMix += ((now - lastMove > 2500 ? 1 : 0) - idleMix) * 0.025;
-      // unwrapped clock for the roam so the shader-time wrap never jumps it
-      const rt = (now - start) / 1000;
-      const roamX =
-        vw * (0.5 + 0.34 * Math.sin(rt * 0.32) + 0.1 * Math.sin(rt * 0.85 + 1.7));
-      const roamY =
-        vh * (0.52 + 0.3 * Math.cos(rt * 0.24) + 0.12 * Math.sin(rt * 0.61));
-      const tx = mouse.px + (roamX - mouse.px) * idleMix;
-      const ty = mouse.py + (roamY - mouse.py) * idleMix;
-      mouse.x += (tx - mouse.x) * 0.07;
-      mouse.y += (ty - mouse.y) * 0.07;
+      // activity rises while the pointer moves and decays to 0 once it stops, so
+      // every cursor-driven effect settles to a still frame between interactions
+      active += ((now - lastMove < 1000 ? 1 : 0) - active) * 0.07;
+      // focal point just eases toward the cursor — no autonomous idle roam
+      mouse.x += (mouse.px - mouse.x) * 0.1;
+      mouse.y += (mouse.py - mouse.y) * 0.1;
       gl.uniform1f(uTime, time);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
-      gl.uniform1f(uIdle, idleMix);
+      gl.uniform1f(uActive, active);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 

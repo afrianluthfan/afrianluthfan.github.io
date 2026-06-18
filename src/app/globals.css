@@ -68,6 +68,19 @@
 }
 
 @layer utilities {
+  #site-nav {
+    transition:
+      transform 0.45s var(--ease-snap),
+      opacity 0.3s ease;
+  }
+
+  /* hidden while the pinned 3D projects section owns the viewport */
+  .nav-hidden #site-nav {
+    transform: translateY(-160%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .text-outline {
     -webkit-text-stroke: 2.5px var(--color-ink);
     color: transparent;
