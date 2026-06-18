@@ -146,39 +146,81 @@ export default function InkField({
     ).matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+    // Every GL handle dies with the context on a loss, so they all live in
+    // mutable slots and get rebuilt from scratch by buildGL() — once on mount,
+    // and again on each `webglcontextrestored`. draw()/resize() gate on `ready`.
+    let prog: WebGLProgram | null = null;
+    let buffer: WebGLBuffer | null = null;
+    let uRes: WebGLUniformLocation | null = null;
+    let uTime: WebGLUniformLocation | null = null;
+    let uMouse: WebGLUniformLocation | null = null;
+    let uIdle: WebGLUniformLocation | null = null;
+    let ready = false;
+
     const compile = (type: number, src: string) => {
       const shader = gl.createShader(type)!;
       gl.shaderSource(shader, src);
       gl.compileShader(shader);
       return shader;
     };
-    const prog = gl.createProgram()!;
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
-    gl.useProgram(prog);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 3, -1, -1, 3]),
-      gl.STATIC_DRAW,
-    );
-    const aPos = gl.getAttribLocation(prog, "a_pos");
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    // (Re)build program, geometry, and uniform bindings on the live context.
+    // Returns false if the GPU bails mid-build (e.g. context lost again) so the
+    // caller can skip scheduling a doomed render loop.
+    const buildGL = () => {
+      const vs = compile(gl.VERTEX_SHADER, VERT);
+      const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+      const program = gl.createProgram();
+      if (!program) return false;
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return false;
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      gl.useProgram(program);
 
-    const u = (name: string) => gl.getUniformLocation(prog, name);
-    const uRes = u("u_res");
-    const uTime = u("u_time");
-    const uMouse = u("u_mouse");
-    const uIdle = u("u_idle");
-    gl.uniform3fv(u("u_bg"), palette.bg);
-    gl.uniform3fv(u("u_ink"), palette.ink);
-    gl.uniform3fv(u("u_pop"), palette.pop);
-    gl.uniform2fv(u("u_clear"), palette.clear);
-    gl.uniform2fv(u("u_calm"), palette.calm);
+      buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 3, -1, -1, 3]),
+        gl.STATIC_DRAW,
+      );
+      const aPos = gl.getAttribLocation(program, "a_pos");
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      const u = (name: string) => gl.getUniformLocation(program, name);
+      uRes = u("u_res");
+      uTime = u("u_time");
+      uMouse = u("u_mouse");
+      uIdle = u("u_idle");
+      gl.uniform3fv(u("u_bg"), palette.bg);
+      gl.uniform3fv(u("u_ink"), palette.ink);
+      gl.uniform3fv(u("u_pop"), palette.pop);
+      gl.uniform2fv(u("u_clear"), palette.clear);
+      gl.uniform2fv(u("u_calm"), palette.calm);
+
+      prog = program;
+      ready = true;
+      return true;
+    };
+
+    // Explicit teardown on real unmount — replaces the old loseContext() call,
+    // which force-killed the context and left React's reused <canvas> stuck on a
+    // dead context (Chrome's broken-image glyph) across StrictMode/Fast Refresh
+    // remounts. Deleting the resources frees the GPU memory without poisoning a
+    // reacquire on the same canvas.
+    const disposeGL = () => {
+      ready = false;
+      if (prog) gl.deleteProgram(prog);
+      if (buffer) gl.deleteBuffer(buffer);
+      prog = null;
+      buffer = null;
+    };
+
+    if (!buildGL()) return;
 
     const mouse = { x: 0, y: 0, px: 0, py: 0, seeded: false };
     const start = performance.now();
@@ -191,6 +233,7 @@ export default function InkField({
     let inView = true;
 
     const draw = (time: number) => {
+      if (!ready) return;
       const now = performance.now();
       // crossfade between the cursor and the roaming idle path
       idleMix += ((now - lastMove > 2500 ? 1 : 0) - idleMix) * 0.025;
@@ -229,8 +272,10 @@ export default function InkField({
       vh = Math.max(1, Math.round(rect.height * dpr));
       canvas.width = vw;
       canvas.height = vh;
-      gl.viewport(0, 0, vw, vh);
-      gl.uniform2f(uRes, vw, vh);
+      if (ready) {
+        gl.viewport(0, 0, vw, vh);
+        gl.uniform2f(uRes, vw, vh);
+      }
       if (!mouse.seeded) {
         // resting focal point before any pointer input (and on touch)
         mouse.seeded = true;
@@ -243,17 +288,33 @@ export default function InkField({
     ro.observe(canvas);
     resize();
 
+    // Real GPU context loss: driver reset, the tab backgrounded too long, or the
+    // browser evicting the oldest of too many live contexts ("Too many active
+    // WebGL contexts"). preventDefault() is the promise that a `restored` event
+    // will follow — without it the context stays dead forever.
     const onLost = (e: Event) => {
       e.preventDefault();
+      ready = false;
+      prog = null;
+      buffer = null;
       setRunning(false);
     };
+    // Same context object returns alive but wiped clean. Rebuild every resource,
+    // re-viewport, and resume the loop if we're still on-screen.
+    const onRestored = () => {
+      if (!buildGL()) return;
+      resize();
+      if (!reduceMotion) setRunning(inView && !document.hidden);
+    };
     canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
 
     if (reduceMotion) {
       return () => {
         ro.disconnect();
         canvas.removeEventListener("webglcontextlost", onLost);
-        gl.getExtension("WEBGL_lose_context")?.loseContext();
+        canvas.removeEventListener("webglcontextrestored", onRestored);
+        disposeGL();
       };
     }
 
@@ -281,7 +342,8 @@ export default function InkField({
       window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
       canvas.removeEventListener("webglcontextlost", onLost);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+      disposeGL();
     };
   }, [variant]);
 

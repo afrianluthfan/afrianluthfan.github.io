@@ -9,7 +9,10 @@ const LINKS = [
 
 export default function Nav({ email }: { email: string }) {
   return (
-    <header className="fixed inset-x-3 top-3 z-50 md:inset-x-6 md:top-5">
+    <header
+      id="site-nav"
+      className="fixed inset-x-3 top-3 z-50 md:inset-x-6 md:top-5"
+    >
       <nav className="mx-auto flex h-14 max-w-[1400px] items-center justify-between border-[3px] border-ink bg-paper px-4 shadow-hard-sm md:h-16 md:px-6">
         <a
           href="#main"
