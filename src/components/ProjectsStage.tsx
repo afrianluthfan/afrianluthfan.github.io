@@ -453,7 +453,7 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
         className="relative border-y-[3px] border-ink"
       >
         <div ref={stageRef} className="relative h-[100svh] w-full overflow-hidden">
-          <TruchetField variant="paper" />
+          <TruchetField variant="paper" className="opacity-30" />
           {/* CSS3DRenderer's DOM (the floating cards) is appended here at z-10 */}
           <div className="pointer-events-none absolute inset-0 z-20 mx-auto flex max-w-[1400px] flex-col justify-between px-5 py-10 md:px-10 md:py-14">
             <div className="flex items-start justify-between gap-6">
