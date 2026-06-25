@@ -350,7 +350,7 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
         // screen-space wobble layered on top (keeps the resting face lively)
         const yaw = nx * 0.12 * (1 - idleMix) + Math.sin(now * 0.0005) * 0.06 * idleMix;
         const pitch =
-          -0.06 - ny * 0.08 * (1 - idleMix) + Math.sin(now * 0.0004) * 0.04 * idleMix;
+          -0.06 + ny * 0.08 * (1 - idleMix) + Math.sin(now * 0.0004) * 0.04 * idleMix;
         eWobble.set(pitch, yaw, 0, "XYZ");
         qWobble.setFromEuler(eWobble);
         qScroll.premultiply(qWobble);
@@ -452,10 +452,10 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
         id="projects"
         className="relative border-y-[3px] border-ink"
       >
-        <div ref={stageRef} className="relative h-[100svh] w-full overflow-hidden">
+        <div ref={stageRef} className="relative h-svh w-full overflow-hidden">
           <TruchetField variant="paper" className="opacity-30" />
           {/* CSS3DRenderer's DOM (the floating cards) is appended here at z-10 */}
-          <div className="pointer-events-none absolute inset-0 z-20 mx-auto flex max-w-[1400px] flex-col justify-between px-5 py-10 md:px-10 md:py-14">
+          <div className="pointer-events-none absolute inset-0 z-20 mx-auto flex max-w-350 flex-col justify-between px-5 py-10 md:px-10 md:py-14">
             <div className="flex items-start justify-between gap-6">
               <div className="max-w-md">
                 <h2 className="font-display text-5xl uppercase leading-[0.9] tracking-tight md:text-7xl">
@@ -487,7 +487,7 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
                 >
                   01 / {pad2(total)}
                 </span>
-                <span className="relative block h-[3px] w-40 max-w-[40vw] bg-ink/15 md:w-72">
+                <span className="relative block h-0.75 w-40 max-w-[40vw] bg-ink/15 md:w-72">
                   <span
                     ref={barRef}
                     className="absolute inset-0 origin-left bg-accent"
@@ -517,7 +517,7 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
       id="projects"
       className="border-y-[3px] border-ink py-24 md:py-28"
     >
-      <div className="mx-auto w-full max-w-[1400px] px-5 md:px-10">
+      <div className="mx-auto w-full max-w-350 px-5 md:px-10">
         <h2 className="font-display text-5xl uppercase leading-[0.9] tracking-tight md:text-7xl">
           Selected projects
         </h2>
