@@ -11,6 +11,21 @@ cv:
       - I have a bachelor's degree in software engineering.  Seeking to use my JavaScript, TypeScript, and Python skills alongside my commitment to teamwork and experiences to serve your company.
 
     experience:
+      - company: Self-employed
+        position: Private English Tutor
+        start_date: 2026-08
+        end_date: present
+        location: Bogor, West Java, Indonesia
+
+      - company: Valence
+        position: Co-Founder & Principal AI Engineer
+        url: https://valence-quant.art
+        start_date: 2026-04
+        end_date: present
+        highlights:
+          - Built an LLM system to accommodate and automate the low-frequency trading style used in the company
+          - Run the infrastructure and the Claude analyst for a BTC perpetual futures desk, including the servers, browser scrapers, and the prompts, tools, and guardrails the model works within
+
       - company: PT Bank Raya Indonesia Tbk.
         position: Management Trainee - Junior Analyst
         start_date: 2024-04
@@ -121,11 +136,11 @@ cv:
         location: Anthropic
 
     portfolio:
-      # - name: Personal Portfolio Website
-      #   highlights:
-      #     - My own personal Portfolio website containing my projects and resume
-      #     - https://riann.is-a.dev/
-      #   status: Finished, needs update on the data per January 2026
+      - name: Personal Portfolio Website
+        highlights:
+          - My own personal Portfolio website containing my projects and resume
+          - https://riann.is-a.dev/
+        status: Finished, needs update on the data per January 2026
 
       # - name: Identi-fy
       #   url: https://identi-fy.live

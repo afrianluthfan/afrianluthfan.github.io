@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://afrianluthfan.github.io"),
   title: "Afrian Luthfan | Software Engineer",
   description:
-    "Portfolio and resume of Afrian Luthfan, a software engineer in Bogor, Indonesia building backend services and AI tools at Bank Raya Indonesia.",
+    "Portfolio and resume of Afrian Luthfan, a software engineer in Bogor, Indonesia co-founder of Valence and building backend services and AI tools at Bank Raya Indonesia.",
   openGraph: {
     title: "Afrian Luthfan | Software Engineer",
     description:

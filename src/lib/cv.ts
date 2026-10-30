@@ -12,7 +12,9 @@ export interface RoleEntry {
   position: string;
   start_date: string;
   end_date: string;
-  highlights: string[];
+  highlights?: string[];
+  location?: string;
+  url?: string;
 }
 
 export interface EducationEntry {
@@ -41,7 +43,6 @@ export interface Cv {
   name: string;
   location: string;
   email: string;
-  phone: string;
   website: string;
   social_networks: SocialNetwork[];
   sections: {

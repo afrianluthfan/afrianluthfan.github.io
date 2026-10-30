@@ -31,7 +31,7 @@ export default function Leadership({ roles }: { roles: RoleEntry[] }) {
                   {role.company}
                 </p>
                 <p className="mt-4 max-w-2xl leading-relaxed">
-                  {role.highlights[0]}
+                  {role.highlights?.[0]}
                 </p>
               </div>
             </div>

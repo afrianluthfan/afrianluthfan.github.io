@@ -33,8 +33,9 @@ export default function Hero({ cv }: { cv: Cv }) {
             className="anim-rise mt-8 max-w-xl text-lg font-medium leading-relaxed md:text-xl"
             style={{ "--rise-delay": "220ms" } as React.CSSProperties}
           >
-            Junior Analyst at Bank Raya Indonesia building backend services,
-            internal APIs, and AI tools used by 1,000+ employees.
+            Co-Founder & Principal AI Engineer at Valence, and Junior Analyst at
+            Bank Raya Indonesia building backend services, internal APIs, and AI
+            tools used by 1,000+ employees.
           </p>
           <div
             className="anim-rise mt-10 flex flex-wrap gap-6"

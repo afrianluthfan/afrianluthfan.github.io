@@ -53,15 +53,6 @@ export default function Contact({ cv }: { cv: Cv }) {
                 GitHub
               </a>
             </li>
-            {/* <li>
-              <a
-                href={`tel:${cv.phone}`}
-                className="inline-flex items-center gap-2 border-[3px] border-ink px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-200 hover:bg-ink hover:text-paper"
-              >
-                <Phone weight="bold" className="size-4" />
-                {cv.phone}
-              </a>
-            </li> */}
           </ul>
         </Reveal>
       </div>

@@ -28,11 +28,28 @@ export default function Experience({ roles }: { roles: RoleEntry[] }) {
                       {role.position}
                     </h3>
                     <p className="mt-3 inline-block bg-accent px-2 py-1 font-mono text-sm font-bold uppercase tracking-wider">
-                      {role.company}
+                      {role.url ? (
+                        <a
+                          href={role.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-4"
+                        >
+                          {role.company} ↗
+                        </a>
+                      ) : (
+                        role.company
+                      )}
                     </p>
+                    {role.location && (
+                      <p className="mt-3 font-mono text-xs font-bold uppercase tracking-wider">
+                        {role.location}
+                      </p>
+                    )}
                   </div>
                   <Chip>{formatRange(role.start_date, role.end_date)}</Chip>
                 </header>
+                {role.highlights && (
                 <ul className="space-y-4">
                   {role.highlights.map((highlight) => (
                     <li key={highlight} className="flex gap-4 leading-relaxed">
@@ -44,6 +61,7 @@ export default function Experience({ roles }: { roles: RoleEntry[] }) {
                     </li>
                   ))}
                 </ul>
+                )}
               </article>
             </Reveal>
           ))}
