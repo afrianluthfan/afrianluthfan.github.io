@@ -16,6 +16,7 @@ const useIso = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+const CURRENT_SITE = "https://riann.is-a.dev";
 const ACCENT = "#ff4d00";
 const INK = "#181611";
 
@@ -35,6 +36,7 @@ function realUrl(project: ProjectEntry): string | undefined {
 }
 
 function projectTag(project: ProjectEntry): string {
+  if (project.tag) return project.tag;
   const url = realUrl(project);
   if (url?.includes("github.com")) return "Open source";
   if (url) return "Live";
@@ -106,7 +108,11 @@ function ProjectCard({
           ))}
         </ul>
       </div>
-      {url ? (
+      {url?.startsWith(CURRENT_SITE) ? (
+        <p className="font-mono text-[11px] font-bold uppercase tracking-widest">
+          You are on this site now
+        </p>
+      ) : url ? (
         <div>
           <BrutalLink
             href={url}
@@ -114,7 +120,7 @@ function ProjectCard({
             size="sm"
             className={isInk ? "shadow-[7px_7px_0_0_var(--color-accent)]" : ""}
           >
-            {url.includes("github.com") ? "View repo" : "Open site"}
+            {url.includes("github.com") ? "View repo" : "Visit site"}
             <ArrowUpRight weight="bold" className="size-4" />
           </BrutalLink>
         </div>
@@ -224,34 +230,36 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
       const faceKey = (v: { x: number; y: number; z: number }) =>
         `${Math.round(v.x)},${Math.round(v.y)},${Math.round(v.z)}`;
       const scratch = new Vector3();
-      const targets = [new Quaternion()];
-      const usedFaces = new Set([faceKey({ x: 0, y: 0, z: 1 })]);
-      for (let i = 1; i < total; i++) {
+      // Depth-first search over the turns for a chain that visits distinct faces.
+      // A greedy pick can dead-end with faces still unvisited, so it backtracks.
+      type Q = InstanceType<typeof Quaternion>;
+      const faceOf = (q: Q) =>
+        faceKey(scratch.set(0, 0, 1).applyQuaternion(q.clone().invert()));
+      const targets: Q[] = [];
+      const usedFaces = new Set<string>();
+      const search = (q: Q, cap: number): boolean => {
+        targets.push(q);
+        usedFaces.add(faceOf(q));
+        if (targets.length === cap) return true;
         const order = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-        let next = null;
         for (const k of order) {
           const t = turns[k];
           const cand = new Quaternion()
             .setFromAxisAngle(t.axis, t.ang)
-            .multiply(targets[i - 1]);
-          // which body face this orientation brings forward
-          const key = faceKey(
-            scratch.set(0, 0, 1).applyQuaternion(cand.clone().invert()),
-          );
-          if (!usedFaces.has(key)) {
-            usedFaces.add(key);
-            next = cand;
-            break;
-          }
+            .multiply(q);
+          if (usedFaces.has(faceOf(cand))) continue;
+          if (search(cand, cap)) return true;
         }
-        // every neighbouring face already used (only if total > 6) — reuse one
-        if (!next) {
-          const t = turns[order[0]];
-          next = new Quaternion()
-            .setFromAxisAngle(t.axis, t.ang)
-            .multiply(targets[i - 1]);
-        }
-        targets.push(next);
+        targets.pop();
+        usedFaces.delete(faceOf(q));
+        return false;
+      };
+      // A cube has six faces. Projects past six continue the chain and reuse faces.
+      search(new Quaternion(), Math.min(total, 6));
+      while (targets.length < total) {
+        const t = turns[0];
+        const last = targets[targets.length - 1] ?? new Quaternion();
+        targets.push(new Quaternion().setFromAxisAngle(t.axis, t.ang).multiply(last));
       }
 
       // Place each card on the cube face its target rotation brings forward,

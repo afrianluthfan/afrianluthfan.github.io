@@ -136,11 +136,13 @@ cv:
         location: Anthropic
 
     portfolio:
-      - name: Personal Portfolio Website
+      - name: Valence (Co-Founder & Principal AI Engineer)
+        url: https://www.valence-quant.art
+        tag: In development
         highlights:
-          - My own personal Portfolio website containing my projects and resume
-          - https://riann.is-a.dev/
-        status: Finished, needs update on the data per January 2026
+          - "Built Valence's LLM orchestration layer: prompts, context, tool calling, and trading bot integration"
+          - Designed and deployed the company web profile at www.valence-quant.art
+          - Built the CI/CD pipeline and provisioned dev and production infrastructure
 
       # - name: Identi-fy
       #   url: https://identi-fy.live
@@ -154,6 +156,18 @@ cv:
           - Used by >1000 employees in the company
           - Internal Use Only
 
+      - name: Uker Mapping Service
+        url: Internal Use Only
+        highlights:
+          - An internal API service that maps the company's CIF acquisition to the respective branch office
+          - Used by ~100 employees in the company
+
+      - name: Personal Portfolio Website
+        highlights:
+          - My own personal Portfolio website containing my projects and resume
+          - https://riann.is-a.dev/
+        status: Finished, needs update on the data per January 2026
+
       - name: AI-Assisted SnippingTool OCR Text Summarizer
         url: https://github.com/afrianluthfan/ai-assisted-snippingtool-ocr-text-summarizer
         highlights:
@@ -163,12 +177,6 @@ cv:
         url: https://github.com/afrianluthfan/uniform-pdf-page-size-transformer
         highlights:
           - A tool that can transform all pages in a PDF file to have the same size using PyMuPDF
-
-      - name: Uker Mapping Service
-        url: Internal Use Only
-        highlights:
-          - An internal API service that maps the company's CIF acquisition to the respective branch office
-          - Used by ~100 employees in the company
 
     Organizational Experience:
       - company: Himpunan Mahasiswa S1 Rekayasa Perangkat Lunak Telkom University

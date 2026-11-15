@@ -37,6 +37,7 @@ export interface ProjectEntry {
   url?: string;
   highlights: string[];
   status?: string;
+  tag?: string;
 }
 
 export interface Cv {
