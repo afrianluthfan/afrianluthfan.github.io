@@ -173,7 +173,7 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
     // lands in the initial / mobile bundle.
     (async () => {
       const [
-        { PerspectiveCamera, Scene, Group, Quaternion, Vector3, Euler },
+        { PerspectiveCamera, Scene, Group, Quaternion, Vector3, Euler, Matrix4 },
         { CSS3DObject, CSS3DRenderer },
       ] = await Promise.all([
           import("three"),
@@ -211,6 +211,126 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
         deck.add(obj);
         return { obj, el };
       });
+
+      // Rounded rim. Faces are inset by EDGE on every side. Each of the 12 cube
+      // edges is a quarter-cylinder of ARC flat strips, each of the 8 vertices a
+      // sphere octant of ARC² triangles. Both sample the same normalized grid,
+      // so strips and corner patches share exact seams.
+      const EDGE = 10;
+      const ARC = 2;
+      type Rim = {
+        obj: InstanceType<typeof CSS3DObject>;
+        el: HTMLElement;
+        dir: InstanceType<typeof Vector3>; // which edge/vertex, scaled by radius - EDGE
+        off: InstanceType<typeof Vector3>; // offset from that edge axis / vertex centre
+        stretch: boolean; // edge strips grow with the face size
+      };
+      type V3 = InstanceType<typeof Vector3>;
+      const rim: Rim[] = [];
+      const basis = new Matrix4();
+      const addRim = (
+        w: number,
+        h: number,
+        clip: string,
+        dir: V3,
+        off: V3,
+        x: V3,
+        z: V3,
+        stretch: boolean,
+      ) => {
+        const el = document.createElement("div");
+        el.style.width = `${w}px`;
+        el.style.height = `${h}px`;
+        el.style.background = "var(--color-ink)";
+        el.style.backfaceVisibility = "hidden";
+        if (clip) el.style.clipPath = clip;
+        const obj = new CSS3DObject(el);
+        el.style.pointerEvents = "none";
+        // local x along `x`, local z (the visible side) along the outward normal
+        obj.quaternion.setFromRotationMatrix(basis.makeBasis(x, z.clone().cross(x), z));
+        deck.add(obj);
+        rim.push({ obj, el, dir, off, stretch });
+      };
+      const addTri = (dir: V3, a: V3, b: V3, c: V3) => {
+        const ctr = a.clone().add(b).add(c).divideScalar(3);
+        const x = b.clone().sub(a).normalize();
+        const z = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
+        if (z.dot(ctr) < 0) z.negate();
+        const y = z.clone().cross(x);
+        // in-plane coords around the centroid, grown 6% so neighbours overlap
+        const pts = [a, b, c].map((p) => {
+          const d = p.clone().sub(ctr).multiplyScalar(1.06);
+          return [d.dot(x), d.dot(y)];
+        });
+        const xs = pts.map((p) => p[0]);
+        const ys = pts.map((p) => p[1]);
+        const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+        // CSS y runs down, three's local y runs up
+        const clip = `polygon(${pts.map(([px, py]) => `${px - x0}px ${y1 - py}px`).join(",")})`;
+        const off = ctr
+          .clone()
+          .addScaledVector(x, (x0 + x1) / 2)
+          .addScaledVector(y, (y0 + y1) / 2);
+        addRim(x1 - x0, y1 - y0, clip, dir, off, x, z, false);
+      };
+      const mix = (a: V3, wa: number, b: V3, wb: number, wc = 0, c?: V3) => {
+        const v = a.clone().multiplyScalar(wa).addScaledVector(b, wb);
+        if (c) v.addScaledVector(c, wc);
+        return v.normalize();
+      };
+      const AX = [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)];
+      const SIGNS = [1, -1];
+      for (let p = 0; p < 3; p++) {
+        for (const s1 of SIGNS) {
+          for (const s2 of SIGNS) {
+            const n1 = AX[(p + 1) % 3].clone().multiplyScalar(s1);
+            const n2 = AX[(p + 2) % 3].clone().multiplyScalar(s2);
+            const dir = n1.clone().add(n2);
+            for (let j = 0; j < ARC; j++) {
+              const u0 = mix(n1, ARC - j, n2, j);
+              const u1 = mix(n1, ARC - j - 1, n2, j + 1);
+              const off = u0.clone().add(u1).multiplyScalar(EDGE / 2);
+              // +1px so adjacent strips overlap instead of showing a hairline
+              const h = u0.distanceTo(u1) * EDGE + 1;
+              addRim(1, h, "", dir, off, AX[p], off.clone().normalize(), true);
+            }
+          }
+        }
+      }
+      for (const sx of SIGNS) {
+        for (const sy of SIGNS) {
+          for (const sz of SIGNS) {
+            const [ex, ey, ez] = [
+              new Vector3(sx, 0, 0),
+              new Vector3(0, sy, 0),
+              new Vector3(0, 0, sz),
+            ];
+            const dir = new Vector3(sx, sy, sz);
+            const g = (i: number, j: number, l: number) =>
+              mix(ex, i, ey, j, l, ez).multiplyScalar(EDGE);
+            for (let i = 0; i < ARC; i++) {
+              for (let j = 0; j < ARC - i; j++) {
+                const l = ARC - 1 - i - j;
+                addTri(dir, g(i + 1, j, l), g(i, j + 1, l), g(i, j, l + 1));
+                if (l > 0) addTri(dir, g(i + 1, j + 1, l - 1), g(i, j + 1, l), g(i + 1, j, l));
+              }
+            }
+          }
+        }
+      }
+
+      // Front-face highlight: one ring that follows the front face, rounded to
+      // match the rim's silhouette.
+      const RING = 3;
+      const ring = document.createElement("div");
+      ring.style.boxSizing = "border-box";
+      ring.style.border = `${RING}px solid ${ACCENT}`;
+      ring.style.borderRadius = `${EDGE}px`;
+      ring.style.boxShadow = "0 0 46px rgba(255,77,0,0.20)";
+      ring.style.backfaceVisibility = "hidden";
+      const ringObj = new CSS3DObject(ring);
+      ring.style.pointerEvents = "none";
+      deck.add(ringObj);
 
       const HALF = Math.PI / 2;
       const STEPS = Math.max(1, total - 1); // face-to-face turns
@@ -281,10 +401,18 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
         const S = clamp(Math.min(w * 0.34, h * 0.6), 300, 460);
         radius = S / 2;
         cards.forEach(({ el }, i) => {
-          el.style.width = `${S}px`;
-          el.style.height = `${S}px`;
+          el.style.width = `${S - 2 * EDGE}px`;
+          el.style.height = `${S - 2 * EDGE}px`;
           cards[i].obj.position.copy(dirs[i]).multiplyScalar(radius);
         });
+        rim.forEach(({ obj, el, dir, off, stretch }) => {
+          obj.position.copy(dir).multiplyScalar(radius - EDGE).add(off);
+          if (stretch) el.style.width = `${S - 2 * EDGE + 1}px`;
+        });
+        // sits over the rim's outer band; any larger leaves a sliver of
+        // background between ring and rim under perspective
+        ring.style.width = `${S}px`;
+        ring.style.height = `${S}px`;
       };
       layout();
 
@@ -376,16 +504,12 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
           }
         }
 
-        // only the front face is lit + clickable (back faces are culled by
-        // backface-visibility, so the others just need their accent cleared)
+        // only the front face is lit + clickable
         for (let i = 0; i < cards.length; i++) {
-          const { el } = cards[i];
-          const isFront = i === front;
-          el.style.pointerEvents = isFront ? "auto" : "none";
-          el.style.boxShadow = isFront
-            ? `0 0 0 3px ${ACCENT}, 0 0 46px rgba(255,77,0,0.20)`
-            : "none";
+          cards[i].el.style.pointerEvents = i === front ? "auto" : "none";
         }
+        ringObj.quaternion.copy(cards[front].obj.quaternion);
+        ringObj.position.copy(dirs[front]).multiplyScalar(radius + 0.5);
 
         if (barRef.current)
           barRef.current.style.transform = `scaleX(${clamp(p, 0, 1).toFixed(4)})`;
@@ -443,6 +567,8 @@ export default function ProjectsStage({ projects }: { projects: ProjectEntry[] }
         // removing each object fires CSS3DObject's "removed" handler, which
         // detaches its DOM element from the renderer.
         cards.forEach(({ obj }) => deck.remove(obj));
+        rim.forEach(({ obj }) => deck.remove(obj));
+        deck.remove(ringObj);
         dom.remove();
       };
     })();
