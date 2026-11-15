@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo_Black, Space_Grotesk, Space_Mono } from "next/font/google";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-init";
 import "./globals.css";
 
 const archivo = Archivo_Black({
@@ -45,7 +46,16 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${archivo.variable} ${grotesk.variable} ${spaceMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* browser extensions inject scripts into <head> before hydration,
+            which shifts React's matching onto this tag */}
+        <script
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+          suppressHydrationWarning
+        />
+      </head>
       <body>
         <a
           href="#main"

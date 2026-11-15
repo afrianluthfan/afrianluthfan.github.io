@@ -19,6 +19,27 @@
   --animate-marquee: marquee 32s linear infinite;
 }
 
+/* dark mode swaps the two base tokens; every bg-/text-/border-/shadow- utility follows */
+:root[data-theme="dark"] {
+  --color-paper: #14130f;
+  --color-ink: #ecebe4;
+  color-scheme: dark;
+}
+
+/* orange blocks keep their light-mode colors so dark text stays readable on them */
+:root[data-theme="dark"] .bg-accent {
+  --color-paper: #f0efe9;
+  --color-ink: #181611;
+  color: var(--color-ink);
+  /* the element's own shadow sits on the dark page, so it uses the light ink.
+     --tw-shadow-color does not inherit, so children keep the dark ink. */
+  --tw-shadow-color: #ecebe4;
+}
+
+:root[data-theme="dark"] .grain {
+  mix-blend-mode: screen;
+}
+
 @keyframes marquee {
   from {
     transform: translateX(0);

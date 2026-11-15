@@ -1,5 +1,6 @@
 import { Envelope } from "@phosphor-icons/react/dist/ssr";
 import { BrutalLink } from "./ui";
+import ThemeToggle from "./ThemeToggle";
 
 const LINKS = [
   { label: "Work", href: "#experience" },
@@ -33,6 +34,7 @@ export default function Nav({ email }: { email: string }) {
               </li>
             ))}
           </ul>
+          <ThemeToggle />
           <BrutalLink href={`mailto:${email}`} size="sm" className="shadow-none hover:shadow-hard-sm">
             <Envelope weight="bold" className="size-4" />
             Email me

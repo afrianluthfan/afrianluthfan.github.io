@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "@/lib/theme";
 
 const VERT = `
 attribute vec2 a_pos;
@@ -103,6 +104,13 @@ void main() {
 `;
 
 const PALETTES = {
+  dark: {
+    bg: [0.078, 0.075, 0.059],
+    ink: [0.925, 0.922, 0.894],
+    pop: [1.0, 0.302, 0.0],
+    clear: [0.34, 0.52],
+    calm: [0.12, 0.8],
+  },
   paper: {
     bg: [0.941, 0.937, 0.914],
     ink: [0.094, 0.086, 0.067],
@@ -123,10 +131,12 @@ export default function InkField({
   variant = "paper",
   className = "",
 }: {
-  variant?: keyof typeof PALETTES;
+  variant?: "paper" | "accent";
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const theme = useTheme();
+  const paletteKey = variant === "paper" && theme === "dark" ? "dark" : variant;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -140,7 +150,7 @@ export default function InkField({
     });
     if (!gl) return;
 
-    const palette = PALETTES[variant];
+    const palette = PALETTES[paletteKey];
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -345,7 +355,7 @@ export default function InkField({
       canvas.removeEventListener("webglcontextrestored", onRestored);
       disposeGL();
     };
-  }, [variant]);
+  }, [paletteKey]);
 
   return (
     <canvas
